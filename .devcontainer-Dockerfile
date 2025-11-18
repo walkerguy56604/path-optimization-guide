@@ -1,2 +1,1 @@
-.devcontainer/Dockerfile
-.devcontainer/devcontainer.json
+FROM mcr.microsoft.com/vscode/devcontainers/python:3.11

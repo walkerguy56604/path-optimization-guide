@@ -16,12 +16,13 @@ def read_daily_log(file_path):
         return f.read()
 
 def extract_summary(log_content):
-    """Extract simple summary: steps, calories, and key symptoms."""
+    """Extract summary: steps, calories, and key symptoms."""
     summary = {}
     
     # Quick entries: steps
     steps_matches = re.findall(r"(\d+(?:,\d+)?) steps", log_content)
-    summary['total_steps'] = sum(int(s.replace(",", "")) for s in steps_matches) if steps_matches else 0
+    quick_steps = sum(int(s.replace(",", "")) for s in steps_matches) if steps_matches else 0
+    summary['quick_steps'] = quick_steps
     
     # Quick entries: calories
     calories_matches = re.findall(r"(\d+) cal", log_content)
@@ -34,39 +35,47 @@ def extract_summary(log_content):
     return summary
 
 def parse_table(log_content, table_title):
-    """Basic placeholder to extract table content by section title."""
+    """Basic table parser by section title."""
     pattern = rf"## {table_title}(.*?)(\n##|\Z)"
     match = re.search(pattern, log_content, re.DOTALL)
     if not match:
         return None
     table_text = match.group(1).strip()
-    # Split lines and remove empty lines
     lines = [line.strip().split("|")[1:-1] for line in table_text.split("\n") if "|" in line]
     return lines
+
+def sum_steps_from_activity_table(table_lines):
+    """Sum all steps in the Activity Log table."""
+    total = 0
+    for row in table_lines[1:]:  # Skip header
+        try:
+            steps = int(row[2].strip())  # Steps are in column 3
+            total += steps
+        except ValueError:
+            continue  # Ignore non-integer entries
+    return total
 
 # === Main Execution ===
 log_content = read_daily_log(log_file_path)
 if log_content:
     summary = extract_summary(log_content)
     print("=== Daily Summary ===")
-    print(f"Total Steps: {summary['total_steps']}")
+    print(f"Steps from Quick Entries: {summary['quick_steps']}")
     print(f"Total Calories: {summary['total_calories']}")
     print("Key Symptoms / Notes:")
     print(summary['symptoms'])
     
-    # Example: parse today's Activity Log table
+    # Parse Activity Log table
     activity_table = parse_table(log_content, "Activity Log")
     if activity_table:
-        print("\nActivity Table Found:")
-        for row in activity_table:
-            print(row)
+        total_table_steps = sum_steps_from_activity_table(activity_table)
+        print(f"Steps from Activity Log Table: {total_table_steps}")
     else:
-        print("\nNo Activity Table Found.")
-    
+        print("No Activity Log table found.")
 else:
     print("No log content to process.")
 
 # === Future Enhancements ===
-# TODO: Automatically calculate steps/calories from tables
+# TODO: Parse Nutrition Log table for calories per meal
 # TODO: Generate charts with matplotlib
 # TODO: Store extracted data in CSV or database for trends

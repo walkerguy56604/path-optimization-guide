@@ -3,9 +3,21 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Virtual environment
+# Virtual environments
 venv/
 .env/
 
 # VS Code settings
 .vscode/
+
+# MacOS system files
+.DS_Store
+
+# Logs
+*.log
+
+# Python packaging
+*.egg
+*.egg-info/
+dist/
+build/

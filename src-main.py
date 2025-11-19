@@ -24,9 +24,9 @@ def extract_summary(log_content):
     quick_steps = sum(int(s.replace(",", "")) for s in steps_matches) if steps_matches else 0
     summary['quick_steps'] = quick_steps
     
-    # Quick entries: calories
+    # Quick entries: calories (non-table)
     calories_matches = re.findall(r"(\d+) cal", log_content)
-    summary['total_calories'] = sum(int(c) for c in calories_matches) if calories_matches else 0
+    summary['quick_calories'] = sum(int(c) for c in calories_matches) if calories_matches else 0
     
     # Symptoms section
     symptoms_section = re.search(r"## 4\. Symptoms / Health Notes(.*?)##", log_content, re.DOTALL)
@@ -52,8 +52,19 @@ def sum_steps_from_activity_table(table_lines):
             steps = int(row[2].strip())  # Steps are in column 3
             total += steps
         except ValueError:
-            continue  # Ignore non-integer entries
+            continue
     return total
+
+def sum_calories_from_nutrition_table(table_lines):
+    """Sum all calories in the Nutrition Log table."""
+    total_calories = 0
+    for row in table_lines[1:]:  # Skip header
+        try:
+            cal = int(row[2].strip())  # Calories are in column 3
+            total_calories += cal
+        except ValueError:
+            continue
+    return total_calories
 
 # === Main Execution ===
 log_content = read_daily_log(log_file_path)
@@ -61,7 +72,7 @@ if log_content:
     summary = extract_summary(log_content)
     print("=== Daily Summary ===")
     print(f"Steps from Quick Entries: {summary['quick_steps']}")
-    print(f"Total Calories: {summary['total_calories']}")
+    print(f"Calories from Quick Entries: {summary['quick_calories']}")
     print("Key Symptoms / Notes:")
     print(summary['symptoms'])
     
@@ -72,10 +83,17 @@ if log_content:
         print(f"Steps from Activity Log Table: {total_table_steps}")
     else:
         print("No Activity Log table found.")
+    
+    # Parse Nutrition Log table
+    nutrition_table = parse_table(log_content, "Nutrition Log")
+    if nutrition_table:
+        total_table_calories = sum_calories_from_nutrition_table(nutrition_table)
+        print(f"Calories from Nutrition Log Table: {total_table_calories}")
+    else:
+        print("No Nutrition Log table found.")
 else:
     print("No log content to process.")
 
 # === Future Enhancements ===
-# TODO: Parse Nutrition Log table for calories per meal
 # TODO: Generate charts with matplotlib
 # TODO: Store extracted data in CSV or database for trends

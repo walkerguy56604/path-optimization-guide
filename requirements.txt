@@ -1,1 +1,3 @@
-# Python dependencies go here
+pandas
+matplotlib
+jupyter

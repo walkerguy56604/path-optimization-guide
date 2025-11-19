@@ -8,4 +8,4 @@ The goal of this project is to provide a structured Python environment for exper
 ## Setup
 1. Open in VS Code with Codespaces or locally with Docker.
 2. The development environment is defined in `.devcontainer/devcontainer.json` and `.devcontainer/Dockerfile`.
-3. Install Python dependencies with:
+3. Install Python dependencies with: 

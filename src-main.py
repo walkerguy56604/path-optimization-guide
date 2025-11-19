@@ -70,27 +70,32 @@ def sum_calories_from_nutrition_table(table_lines):
 log_content = read_daily_log(log_file_path)
 if log_content:
     summary = extract_summary(log_content)
-    print("=== Daily Summary ===")
-    print(f"Steps from Quick Entries: {summary['quick_steps']}")
-    print(f"Calories from Quick Entries: {summary['quick_calories']}")
-    print("Key Symptoms / Notes:")
-    print(summary['symptoms'])
     
     # Parse Activity Log table
     activity_table = parse_table(log_content, "Activity Log")
-    if activity_table:
-        total_table_steps = sum_steps_from_activity_table(activity_table)
-        print(f"Steps from Activity Log Table: {total_table_steps}")
-    else:
-        print("No Activity Log table found.")
+    total_table_steps = sum_steps_from_activity_table(activity_table) if activity_table else 0
     
     # Parse Nutrition Log table
     nutrition_table = parse_table(log_content, "Nutrition Log")
-    if nutrition_table:
-        total_table_calories = sum_calories_from_nutrition_table(nutrition_table)
-        print(f"Calories from Nutrition Log Table: {total_table_calories}")
-    else:
-        print("No Nutrition Log table found.")
+    total_table_calories = sum_calories_from_nutrition_table(nutrition_table) if nutrition_table else 0
+    
+    # Grand totals
+    grand_total_steps = summary['quick_steps'] + total_table_steps
+    grand_total_calories = summary['quick_calories'] + total_table_calories
+    
+    # === Print Summary ===
+    print("=== Daily Summary ===")
+    print(f"Steps from Quick Entries: {summary['quick_steps']}")
+    print(f"Steps from Activity Log Table: {total_table_steps}")
+    print(f"GRAND TOTAL STEPS: {grand_total_steps}\n")
+    
+    print(f"Calories from Quick Entries: {summary['quick_calories']}")
+    print(f"Calories from Nutrition Log Table: {total_table_calories}")
+    print(f"GRAND TOTAL CALORIES: {grand_total_calories}\n")
+    
+    print("Key Symptoms / Notes:")
+    print(summary['symptoms'])
+    
 else:
     print("No log content to process.")
 

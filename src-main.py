@@ -1,8 +1,17 @@
-- Update the repository with new scripts or data as needed.
+import os
 
-## Repository Structure
-- `.devcontainer/` – Container configuration files
-- `src/` – Python scripts
-- `requirements.txt` – Python dependencies
-- `README.md` – Project overview
-- `.gitignore` – Files to exclude from GitHub
+# Path to the daily log (adjust as needed)
+log_file_path = "../daily_logs/2025-11-18.md"
+
+def read_daily_log(file_path):
+    if not os.path.exists(file_path):
+        print(f"File {file_path} not found.")
+        return None
+    with open(file_path, "r") as f:
+        content = f.read()
+    return content
+
+# Test reading
+log_content = read_daily_log(log_file_path)
+if log_content:
+    print("Daily log loaded successfully!")
